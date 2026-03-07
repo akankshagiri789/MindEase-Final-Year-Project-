@@ -231,19 +231,19 @@
 
 </body>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<!-- <script type="text/javascript">
+<script type="text/javascript">
   var graphs = {{ graphJSON | safe}};
-  Plotly.plot('chart', graphs, {});
+  Plotly.newPlot('chart', graphs.data, graphs.layout, {responsive: true});
   var graphs2 = {{ graphJSON2 | safe}};
-  Plotly.plot('chart2', graphs2, {});
+  Plotly.newPlot('chart2', graphs2.data, graphs2.layout, {responsive: true});
   var graphs3 = {{ graphJSON3 | safe}};
-  Plotly.plot('chart3', graphs3, {});
+  Plotly.newPlot('chart3', graphs3.data, graphs3.layout, {responsive: true});
   var graphs4 = {{ graphJSON4 | safe}};
-  Plotly.plot('chart4', graphs4, {});
+  Plotly.newPlot('chart4', graphs4.data, graphs4.layout, {responsive: true});
   var graphs5 = {{ graphJSON5 | safe}};
-  Plotly.plot('chart5', graphs5, {});
+  Plotly.newPlot('chart5', graphs5.data, graphs5.layout, {responsive: true});
   var graphs6 = {{ graphJSON6 | safe}};
-  Plotly.plot('chart6', graphs6, {});
-</script> -->
+  Plotly.newPlot('chart6', graphs6.data, graphs6.layout, {responsive: true});
+</script>
 
 </html>

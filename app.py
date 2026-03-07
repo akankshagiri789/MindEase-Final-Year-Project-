@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import plotly
 import plotly.express as px
+import plotly.graph_objects as go
 from flask import Flask, redirect, render_template, flash, request, jsonify, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_required, logout_user, login_user, LoginManager, current_user
@@ -208,12 +209,113 @@ def exercises(): return render_template('exercises.html')
 @login_required
 def analysis():
     try:
-        train_df = pd.read_csv('dreaddit-train.csv', encoding='ISO-8859-1')
-        fig = px.pie(train_df, names='subreddit', title='Subreddit Distribution')
-        graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-        return render_template('analysis.html', graphJSON=graphJSON)
-    except:
-        return "Analysis data not found."
+        train_df = pd.read_csv('dreaddit-train.csv', encoding='ISO-8859-1').copy()
+
+        # 1) Distribution of stress-related subreddit categories
+        subreddit_counts = train_df['subreddit'].value_counts()
+        fig1 = go.Figure(
+            data=[
+                go.Pie(
+                    labels=subreddit_counts.index.tolist(),
+                    values=[int(v) for v in subreddit_counts.values.tolist()],
+                    hole=0.35
+                )
+            ]
+        )
+        fig1.update_layout(title='Stress Type Distribution (Subreddit)', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        # 2) Stress vs no-stress label balance
+        stress_count = int((train_df['label'] == 1).sum())
+        no_stress_count = int((train_df['label'] == 0).sum())
+        fig2 = go.Figure(
+            data=[
+                go.Bar(
+                    x=['Stress', 'No Stress'],
+                    y=[stress_count, no_stress_count],
+                    text=[stress_count, no_stress_count],
+                    textposition='outside',
+                    marker_color=['#EF553B', '#636EFA']
+                )
+            ]
+        )
+        fig2.update_layout(title='Stress vs No Stress Posts', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        # 3) Sentiment spread by major stress types (top 8 categories)
+        top_subreddits = train_df['subreddit'].value_counts().head(8).index.tolist()
+        fig3 = go.Figure()
+        for sub in top_subreddits:
+            vals = pd.to_numeric(train_df.loc[train_df['subreddit'] == sub, 'sentiment'], errors='coerce').dropna()
+            fig3.add_trace(go.Box(name=str(sub), y=vals.tolist(), boxmean=True))
+        fig3.update_layout(title='Sentiment Distribution by Stress Type', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        # 4) Social engagement: comments vs karma
+        sample_df = train_df[['social_num_comments', 'social_karma', 'subreddit']].copy()
+        sample_df['social_num_comments'] = pd.to_numeric(sample_df['social_num_comments'], errors='coerce')
+        sample_df['social_karma'] = pd.to_numeric(sample_df['social_karma'], errors='coerce')
+        sample_df = sample_df.dropna(subset=['social_num_comments', 'social_karma'])
+        sample_df = sample_df.sort_values('social_karma', ascending=False).head(1200)
+        fig4 = go.Figure()
+        for sub in sample_df['subreddit'].dropna().unique().tolist():
+            sub_df = sample_df[sample_df['subreddit'] == sub]
+            fig4.add_trace(
+                go.Scatter(
+                    x=sub_df['social_num_comments'].tolist(),
+                    y=sub_df['social_karma'].tolist(),
+                    mode='markers',
+                    name=str(sub),
+                    opacity=0.7
+                )
+            )
+        fig4.update_layout(title='Subreddit Posts vs Social Karma', xaxis_title='social_num_comments', yaxis_title='social_karma', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        # 5) Confidence level histogram
+        conf = pd.to_numeric(train_df['confidence'], errors='coerce').dropna()
+        hist_counts, bin_edges = np.histogram(conf, bins=20)
+        bin_centers = ((bin_edges[:-1] + bin_edges[1:]) / 2).tolist()
+        fig5 = go.Figure(
+            data=[
+                go.Bar(
+                    x=bin_centers,
+                    y=[int(v) for v in hist_counts.tolist()],
+                    marker_color='#1f77b4'
+                )
+            ]
+        )
+        fig5.update_layout(title='Model Confidence Distribution', xaxis_title='confidence', yaxis_title='count', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        # 6) Linguistic signal counts for key mental-health indicators
+        signals = ['Anxiety', 'Anger', 'Sadness', 'Health Concern', 'Death Mention']
+        post_counts = [
+            int((pd.to_numeric(train_df['lex_liwc_anx'], errors='coerce').fillna(0) > 0).sum()),
+            int((pd.to_numeric(train_df['lex_liwc_anger'], errors='coerce').fillna(0) > 0).sum()),
+            int((pd.to_numeric(train_df['lex_liwc_sad'], errors='coerce').fillna(0) > 0).sum()),
+            int((pd.to_numeric(train_df['lex_liwc_health'], errors='coerce').fillna(0) > 0).sum()),
+            int((pd.to_numeric(train_df['lex_liwc_death'], errors='coerce').fillna(0) > 0).sum())
+        ]
+        fig6 = go.Figure(
+            data=[
+                go.Bar(
+                    x=signals,
+                    y=post_counts,
+                    text=post_counts,
+                    textposition='outside',
+                    marker_color=['#636EFA', '#EF553B', '#00CC96', '#AB63FA', '#FFA15A']
+                )
+            ]
+        )
+        fig6.update_layout(title='Health-Issue Language Signals in Posts', xaxis_title='signal', yaxis_title='post_count', margin=dict(l=20, r=20, t=50, b=20), height=350)
+
+        return render_template(
+            'analysis.html',
+            graphJSON=json.dumps(fig1, cls=plotly.utils.PlotlyJSONEncoder),
+            graphJSON2=json.dumps(fig2, cls=plotly.utils.PlotlyJSONEncoder),
+            graphJSON3=json.dumps(fig3, cls=plotly.utils.PlotlyJSONEncoder),
+            graphJSON4=json.dumps(fig4, cls=plotly.utils.PlotlyJSONEncoder),
+            graphJSON5=json.dumps(fig5, cls=plotly.utils.PlotlyJSONEncoder),
+            graphJSON6=json.dumps(fig6, cls=plotly.utils.PlotlyJSONEncoder),
+        )
+    except Exception as e:
+        return f"Analysis data not found. Error: {str(e)}"
 
 @app.route('/facial')
 @login_required
