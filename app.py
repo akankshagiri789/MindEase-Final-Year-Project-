@@ -201,6 +201,14 @@ def music(): return render_template('music.html')
 @login_required
 def quizandgame(): return render_template('quizandgame.html')
 
+@app.route('/quiz')
+@login_required
+def quiz(): return render_template('quiz.html')
+
+@app.route('/game')
+@login_required
+def game(): return render_template('game.html')
+
 @app.route('/exercises')
 @login_required
 def exercises(): return render_template('exercises.html')
