@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facial Recognition Stress Detection</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .card-facial {
+            background: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 2.5em;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            text-align: center;
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            background: #f8f9ff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .file-input-label:hover {
+            background: #e8ebf5;
+            border-color: #764ba2;
+        }
+        
+        .file-name {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 10px;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-top: 25px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #333;
+            min-height: 150px;
+        }
+        
+        .features {
+            background: #f0f4ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.8;
+        }
+        
+        .features strong {
+            color: #667eea;
+        }
+        
+        .nav-links {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .nav-links a {
+            display: block;
+            color: #667eea;
+            text-decoration: none;
+            margin: 8px 0;
+            font-size: 14px;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .tab-btn {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tab-content {
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block !important;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        .camera-container {
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card-facial">
+        <div class="card-title">👤 Facial Stress Detection</div>
+        <div class="subtitle">AI-powered emotion recognition from facial expressions</div>
+        
+        <div class="features">
+            <strong>Features:</strong><br>
+            • Real-time face detection<br>
+            • Emotion recognition (7 emotions)<br>
+            • Stress level assessment<br>
+            • Confidence scoring
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e0e0e0;">
+            <button type="button" class="tab-btn active" onclick="switchTab('upload')">Upload Photo</button>
+            <button type="button" class="tab-btn" onclick="switchTab('camera')">Camera Capture</button>
+        </div>
+        
+        <!-- Upload Tab -->
+        <div id="upload-tab" class="tab-content active">
+            <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                <div class="form-group">
+                    <label>Select Your Photo</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="imageInput" name="image" accept="image/*">
+                        <label for="imageInput" class="file-input-label">
+                            Photo or drag image here
+                        </label>
+                    </div>
+                    <div class="file-name" id="fileName"></div>
+                    <small style="color: #999; display: block; margin-top: 8px;">
+                        Supported: PNG, JPG, JPEG, GIF, BMP (Max 16MB)
+                    </small>
+                </div>
+                <button type="submit" class="btn-submit">Analyze Photo</button>
+            </form>
+        </div>
+        
+        <!-- Camera Tab -->
+        <div id="camera-tab" class="tab-content" style="display: none;">
+            <div class="camera-container">
+                <video id="webcam" autoplay playsinline style="width: 100%; border-radius: 10px; background: #000; margin-bottom: 15px;"></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-submit" onclick="capturePhoto()" style="flex: 1;">Capture Photo</button>
+                    <button type="button" class="btn-submit" onclick="stopCamera()" style="flex: 1; background: #999;">Stop Camera</button>
+                </div>
+                <div id="cameraStatus" style="margin-top: 15px; padding: 10px; background: #f0f0f0; border-radius: 5px; display: none; color: #333;">
+                    <strong>Camera Status:</strong> <span id="statusText"></span>
+                </div>
+            </div>
+        </div>
+        
+        {% if prediction_text3 %}
+        <div class="result-box">{{ prediction_text3 }}</div>
+        {% endif %}
+        
+        <div class="nav-links">
+            <a href="{{ url_for('i') }}">📊 Use Numerical Detection</a>
+            <a href="{{ url_for('stress_text') }}">📝 Use Text Analysis</a>
+            <a href="{{ url_for('multimodal_stress') }}" style="color: #28a745; font-weight: bold;">🎯 Try Multimodal Analysis</a>
+        </div>
+    </div>
+    
+    <script>
+        let webcamStream = null;
+        
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName + '-tab');
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.display = 'block';
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Start camera if camera tab
+            if (tabName === 'camera') {
+                startCamera();
+            } else {
+                stopCamera();
+            }
+        }
+        
+        // Start webcam
+        async function startCamera() {
+            try {
+                const statusDiv = document.getElementById('cameraStatus');
+                const statusText = document.getElementById('statusText');
+                statusDiv.style.display = 'block';
+                statusText.textContent = 'Requesting camera access...';
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                    audio: false
+                });
+                
+                webcamStream = stream;
+                const video = document.getElementById('webcam');
+                video.srcObject = stream;
+                
+                statusText.textContent = 'Camera ready - Position your face and click Capture';
+                statusDiv.style.background = '#d4edda';
+                statusDiv.style.color = '#155724';
+                
+            } catch (error) {
+                const statusDiv = document.getElementById('cameraStatus');
+                const statusText = document.getElementById('statusText');
+                statusDiv.style.display = 'block';
+                statusText.textContent = 'Camera access denied: ' + error.message;
+                statusDiv.style.background = '#f8d7da';
+                statusDiv.style.color = '#721c24';
+            }
+        }
+        
+        // Stop camera
+        function stopCamera() {
+            if (webcamStream) {
+                webcamStream.getTracks().forEach(track => track.stop());
+                webcamStream = null;
+                document.getElementById('webcam').srcObject = null;
+                document.getElementById('cameraStatus').style.display = 'none';
+            }
+        }
+        
+        // Capture photo from camera
+        async function capturePhoto() {
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            
+            if (!video.srcObject) {
+                alert('Camera not active. Please switch to Camera tab first.');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            // Convert canvas to blob and create FormData
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('image', blob, 'camera_capture.jpg');
+                
+                try {
+                    const response = await fetch(window.location.href, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const html = await response.text();
+                    document.documentElement.innerHTML = html;
+                } catch (error) {
+                    alert('Error sending photo: ' + error.message);
+                }
+            }, 'image/jpeg', 0.95);
+        }
+        
+        // File upload
+        const imageInput = document.getElementById('imageInput');
+        const fileNameDisplay = document.getElementById('fileName');
+        
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    fileNameDisplay.textContent = 'Selected: ' + this.files[0].name;
+                    fileNameDisplay.style.display = 'block';
+                }
+            });
+        }
+        
+        // Show result box if there are results
+        const resultBox = document.querySelector('.result-box');
+        if (resultBox && resultBox.textContent.trim() !== '') {
+            resultBox.style.display = 'block';
+        }
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multimodal Stress Detection</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .modality-section {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .modality-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="file"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        @media (max-width: 600px) {
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .result-box {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 20px;
+            margin-top: 30px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            color: #333;
+            min-height: 200px;
+        }
+        
+        .optional-note {
+            font-size: 12px;
+            color: #999;
+            font-style: italic;
+            margin-top: 5px;
+        }
+        
+        .success-badge {
+            display: inline-block;
+            background: #4caf50;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .warning-badge {
+            display: inline-block;
+            background: #ff9800;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .modal-tab-btn {
+            background: #e0e0e0;
+            color: #333;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .modal-tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .modal-tab-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .modal-tab-content {
+            animation: fadeIn 0.3s;
+        }
+        
+        .camera-container-modal {
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+        
+        .modal-camera-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .modal-camera-btn:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Multimodal Stress Detection</h1>
+        <p style="text-align: center; color: white; margin-bottom: 30px;">Combine multiple detection methods for comprehensive stress analysis</p>
+        
+        <form method="POST" enctype="multipart/form-data">
+            <!-- Numerical Section -->
+            <div class="modality-section">
+                <div class="modality-title">📊 Numerical Data (Optional)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    Provide physiological measurements for numerical stress detection
+                </p>
+                <div class="input-row">
+                    <div class="form-group">
+                        <label for="rr">Sleep Hours per Night:</label>
+                        <input type="number" id="rr" name="rr" step="0.5" min="0" max="24" placeholder="e.g., 7.5">
+                        <span class="optional-note">Hours of sleep</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="bp">Blood Pressure (Systolic):</label>
+                        <input type="number" id="bp" name="bp" step="1" min="50" max="200" placeholder="e.g., 120">
+                        <span class="optional-note">mmHg</span>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <div class="form-group">
+                        <label for="bo">Respiration Rate:</label>
+                        <input type="number" id="bo" name="bo" step="1" min="5" max="50" placeholder="e.g., 16">
+                        <span class="optional-note">Breaths per minute</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="hr">Heart Rate:</label>
+                        <input type="number" id="hr" name="hr" step="1" min="30" max="200" placeholder="e.g., 72">
+                        <span class="optional-note">Beats per minute</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Text Section -->
+            <div class="modality-section">
+                <div class="modality-title">📝 Text Analysis (Optional)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    Enter text describing how you're feeling for text-based stress detection
+                </p>
+                <div class="form-group">
+                    <label for="text">Your Feelings/Journal Entry:</label>
+                    <textarea id="text" name="text" placeholder="Write about your day, feelings, concerns, or anything on your mind..."></textarea>
+                    <span class="optional-note">Natural language processing will analyze stress indicators</span>
+                </div>
+            </div>
+            
+            <!-- Facial Section -->
+            <div class="modality-section">
+                <div class="modality-title">Facial Recognition (Optional)</div>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                    Provide a clear photo of your face for facial emotion analysis
+                </p>
+                
+                <!-- Image/Camera Tabs -->
+                <div style="display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid #e0e0e0;">
+                    <button type="button" class="modal-tab-btn active" onclick="switchFacialTab('upload_modal', event)">Upload Photo</button>
+                    <button type="button" class="modal-tab-btn" onclick="switchFacialTab('camera_modal', event)">Camera Capture</button>
+                </div>
+                
+                <!-- Upload Option -->
+                <div id="upload_modal" class="modal-tab-content" style="display: block;">
+                    <div class="form-group">
+                        <label for="image">Select Image:</label>
+                        <input type="file" id="image" name="image" accept="image/*">
+                        <div id="fileNameModal" class="file-name"></div>
+                        <span class="optional-note">Supported: PNG, JPG, JPEG, GIF, BMP (Max 16MB)</span>
+                    </div>
+                </div>
+                
+                <!-- Camera Option -->
+                <div id="camera_modal" class="modal-tab-content" style="display: none;">
+                    <div class="camera-container-modal">
+                        <video id="webcamModal" autoplay playsinline style="width: 100%; border-radius: 10px; background: #000; margin-bottom: 15px; max-height: 300px;"></video>
+                        <canvas id="canvasModal" style="display: none;"></canvas>
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" class="modal-camera-btn" onclick="capturePhotoModal()" style="flex: 1;">Capture Photo</button>
+                            <button type="button" class="modal-camera-btn" onclick="stopCameraModal()" style="flex: 1;">Stop Camera</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn">🔍 Analyze Stress (Multimodal)</button>
+            <p style="text-align: center; color: white; margin-top: 15px; font-size: 14px;">
+                Leave empty fields to skip that detection method
+            </p>
+        </form>
+        
+        {% if prediction_text3 %}
+        <div class="result-box">{{ prediction_text3 }}</div>
+        {% endif %}
+    </div>
+    
+    <script>
+        let webcamStreamModal = null;
+        
+        // Switch tabs in facial section
+        function switchFacialTab(tabName, event) {
+            event.preventDefault();
+            
+            // Hide all tabs
+            document.querySelectorAll('.modal-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.modal-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabName);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+            }
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+            
+            // Start/stop camera
+            if (tabName === 'camera_modal') {
+                startCameraModal();
+            } else {
+                stopCameraModal();
+            }
+        }
+        
+        // Start camera for modal
+        async function startCameraModal() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 480 } },
+                    audio: false
+                });
+                
+                webcamStreamModal = stream;
+                const video = document.getElementById('webcamModal');
+                video.srcObject = stream;
+                
+            } catch (error) {
+                alert('Camera access denied: ' + error.message);
+            }
+        }
+        
+        // Stop camera for modal
+        function stopCameraModal() {
+            if (webcamStreamModal) {
+                webcamStreamModal.getTracks().forEach(track => track.stop());
+                webcamStreamModal = null;
+                document.getElementById('webcamModal').srcObject = null;
+            }
+        }
+        
+        // Capture photo from modal camera
+        function capturePhotoModal() {
+            const video = document.getElementById('webcamModal');
+            const canvas = document.getElementById('canvasModal');
+            
+            if (!video.srcObject) {
+                alert('Camera not active.');
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            
+            // Convert canvas to file and update input
+            canvas.toBlob((blob) => {
+                const file = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+                const fileInput = document.getElementById('image');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                fileInput.files = dataTransfer.files;
+                
+                // Update file name display
+                document.getElementById('fileNameModal').textContent = 'Captured: camera_capture.jpg';
+                
+                alert('Photo captured! Click Submit to analyze.');
+            }, 'image/jpeg', 0.95);
+        }
+        
+        // File upload handler
+        const imageInput = document.getElementById('image');
+        const fileNameDisplay = document.getElementById('fileNameModal');
+        
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    fileNameDisplay.textContent = 'Selected: ' + this.files[0].name;
+                }
+            });
+        }
+        
+        // Cleanup on unload
+        window.addEventListener('beforeunload', stopCameraModal);
+    </script>
+</body>
+</html>

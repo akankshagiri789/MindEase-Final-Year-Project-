@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-Based Stress Detection</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://source.unsplash.com/1600x900/?healthcare">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="icon" href="https://source.unsplash.com/1600x900/?healthcare">
+</head>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        font-family: 'Open Sans', sans-serif;
+        background: #222;
+        background-image: url('https://source.unsplash.com/1600x900/?study');
+        font-size: 120%;
+        padding: 20px;
+    }
+
+    .card {
+        background: #000000d0;
+        color: white;
+        padding: 2em;
+        border-radius: 30px;
+        width: 100%;
+        max-width: 600px;
+        margin: 0.75em;
+    }
+
+    .butn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        align-content: center;
+    }
+
+    textarea.search-bar {
+        border: none;
+        outline: none;
+        border-radius: 15px;
+        background: #7c7c7c2b;
+        color: white;
+        font-family: inherit;
+        font-size: 95%;
+        width: 100%;
+        padding: 15px;
+        min-height: 150px;
+        resize: vertical;
+    }
+
+    textarea.search-bar::placeholder {
+        color: #aaa;
+    }
+
+    button:hover {
+        background: whitesmoke;
+    }
+
+    .prediction-result {
+        background: #1a1a1a;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        white-space: pre-line;
+        line-height: 1.6;
+    }
+</style>
+
+<body>
+    <div class="card login">
+        <div class="butn" style="padding: 0; margin: 0;">
+            <h3><u>Text-Based Stress Detection</u></h3>
+        </div>
+        <br>
+        <p style="text-align: center; color: #aaa; font-size: 0.9em;">
+            Share how you're feeling, and we'll analyze your text for stress indicators
+        </p>
+        <br>
+        <form action="{{ url_for('stressdetect_text')}}" method="post">
+            <div class="mb-3">
+                <h5>How are you feeling today?</h5>
+                <textarea 
+                    class="search-bar" 
+                    name="text" 
+                    placeholder="Type your thoughts, feelings, or describe your day... (e.g., 'I've been feeling really anxious lately about work and I can't seem to sleep well...')" 
+                    required="required"></textarea>
+            </div>
+
+            <div class="butn">
+                <button type="submit" class="btn btn-info" style="
+                    margin: 0 auto;
+                    display: block;
+                    padding: 10px 30px;
+                    font-size: 16px;" value="Analyze"><b>Analyze Stress Level</b></button>
+            </div>
+        </form>
+        
+        {% if prediction_text3 %}
+        <div class="prediction-result">
+            <b>{{ prediction_text3 }}</b>
+        </div>
+        {% endif %}
+
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('i') }}" style="color: #17a2b8; text-decoration: none;">
+                ← Use Numerical Input Method Instead
+            </a>
+            <br><br>
+            <a href="{{ url_for('stress_text') }}" style="color: #17a2b8; text-decoration: none;">
+                Refresh / Try Again
+            </a>
+        </div>
+    </div>
+</body>
+
+</html>

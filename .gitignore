@@ -1,0 +1,20 @@
+.env
+venv/
+__pycache__/
+*.pyc
+
+# Local runtime files
+instance/
+uploads/
+database.db
+
+# ML artifacts (large/generated)
+*.h5
+*.keras
+*.pkl
+*.joblib
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
